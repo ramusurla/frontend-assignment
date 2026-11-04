@@ -1,0 +1,384 @@
+<div class="contacts-page">
+
+    <div class="page-header">
+        <div>
+            <h1>Contact Management</h1>
+            <p>Manage and view all your contacts</p>
+        </div>
+
+        <button class="add-btn" type="button" (click)="openAddForm()">
+            + Add Contact
+        </button>
+    </div>
+
+
+
+    @if (successMessage) {
+    <div class="success-message" role="status">
+        <span>✓ {{ successMessage }}</span>
+
+        <button type="button" aria-label="Dismiss notification" (click)="successMessage = ''">
+            ✕
+        </button>
+    </div>
+    }
+
+
+    @if (showForm) {
+    <div class="form-overlay">
+        <div class="contact-form-card">
+            <div class="form-heading">
+                <h2>
+                    {{ editingContactId ? 'Edit Contact' : 'Add New Contact' }}
+                </h2>
+                <button type="button" (click)="closeForm()">✕</button>
+            </div>
+
+            <form [formGroup]="contactForm" (ngSubmit)="saveContact()">
+                <div class="form-grid">
+
+                    <div class="form-field">
+                        <label>First Name *</label>
+                        <input formControlName="first_name" placeholder="Enter first name" />
+                        @if (contactForm.controls.first_name.touched &&
+                        contactForm.controls.first_name.invalid) {
+                        <small>First name is required.</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label>Last Name *</label>
+                        <input formControlName="last_name" placeholder="Enter last name" />
+                        @if (contactForm.controls.last_name.touched &&
+                        contactForm.controls.last_name.invalid) {
+                        <small>Last name is required.</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label>Email *</label>
+                        <input type="email" formControlName="emailId" placeholder="example@gmail.com" />
+                        @if (contactForm.controls.emailId.touched &&
+                        contactForm.controls.emailId.invalid) {
+                        <small>Enter a valid email address.</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label>Age *</label>
+                        <input type="number" formControlName="age" min="1" max="120" />
+                        @if (contactForm.controls.age.touched &&
+                        contactForm.controls.age.invalid) {
+                        <small>Age must be between 1 and 120.</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label>Gender *</label>
+                        <select formControlName="gender">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Mobile Number *</label>
+                        <input formControlName="mobilenumber" maxlength="10" inputmode="numeric"
+                            placeholder="10 digit mobile number" />
+                        @if (contactForm.controls.mobilenumber.touched &&
+                        contactForm.controls.mobilenumber.invalid) {
+                        <small>Enter a valid 10-digit mobile number.</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label>PAN Number *</label>
+                        <input formControlName="pan_no" maxlength="10" placeholder="ABCDE1234F"
+                            (input)="onPanInput($event)" style="text-transform: uppercase" />
+                        @if (contactForm.controls.pan_no.touched &&
+                        contactForm.controls.pan_no.invalid) {
+                        <small>Enter a valid PAN number.</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label>Aadhaar Number *</label>
+                        <input formControlName="adhaar_no" maxlength="12" inputmode="numeric"
+                            placeholder="12 digit Aadhaar number" />
+                        @if (contactForm.controls.adhaar_no.touched &&
+                        contactForm.controls.adhaar_no.invalid) {
+                        <small>Enter a valid 12-digit Aadhaar number.</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label>Status</label>
+                        <select formControlName="status">
+                            <option [ngValue]="true">Active</option>
+                            <option [ngValue]="false">Inactive</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                @if (formError) {
+                <p class="form-error" role="alert">{{ formError }}</p>
+                }
+
+                <div class="form-actions">
+                    <button type="button" class="cancel-form-btn" (click)="closeForm()">Cancel</button>
+                    <button type="submit" class="save-btn" [disabled]="saving">
+                        {{ saving ? 'Saving...' : (editingContactId ? 'Update Contact' : 'Save Contact') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    }
+
+
+    <div class="contacts-card">
+
+        <div class="toolbar">
+            <h2>All Contacts</h2>
+
+            <input type="search" name="search" [(ngModel)]="searchTerm"
+                placeholder="Search by name, email, mobile..." />
+        </div>
+
+        @if (loading) {
+        <div class="loading-container" role="status">
+            <div class="spinner"></div>
+            <p>Loading contacts...</p>
+        </div>
+        }
+
+        @if (errorMessage) {
+        <div class="error-message">
+            {{ errorMessage }}
+            <button type="button" (click)="loadContacts()">
+                Retry
+            </button>
+        </div>
+        }
+
+        @if (!loading && !errorMessage) {
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (contact of filteredContacts; track contact.id) {
+                    <tr>
+                        <td>
+                            {{ contact.first_name }}
+                            {{ contact.last_name }}
+                        </td>
+
+                        <td>{{ contact.emailId }}</td>
+                        <td>{{ contact.mobilenumber }}</td>
+                        <td>{{ contact.age }}</td>
+                        <td>{{ contact.gender }}</td>
+
+                        <td>
+                            <span class="status" [class.active]="contact.status">
+                                {{ contact.status ? 'Active' : 'Inactive' }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="action-buttons">
+
+                                <button type="button" class="view-btn" (click)="viewContact(contact)">
+                                    View
+                                </button>
+
+                                <button type="button" class="edit-btn" (click)="editContact(contact)">
+                                    Edit
+                                </button>
+
+                                <button type="button" class="delete-btn" (click)="openDeleteDialog(contact)">
+                                    Delete
+                                </button>
+
+
+
+                            </div>
+                        </td>
+
+                    </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="7" class="empty-message">
+                            No contacts found.
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        }
+    </div>
+</div>
+
+
+<!-- Delete Confirmation Dialog -->
+
+@if (contactToDelete) {
+<div class="delete-overlay">
+
+    <div class="delete-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-title"
+        aria-describedby="delete-description">
+
+        <div class="delete-icon">
+            🗑
+        </div>
+
+        <h2 id="delete-title">Delete Contact?</h2>
+
+        <p id="delete-description">
+            Are you sure you want to delete
+            <strong>
+                {{ contactToDelete.first_name }}
+                {{ contactToDelete.last_name }}
+            </strong>?
+        </p>
+
+        <p class="delete-warning">
+            This action cannot be undone.
+        </p>
+
+        <div class="delete-actions">
+
+            <button type="button" class="delete-cancel-btn" [disabled]="deleting" (click)="closeDeleteDialog()">
+                Cancel
+            </button>
+
+            <button type="button" class="delete-confirm-btn" [disabled]="deleting" (click)="confirmDelete()">
+                {{ deleting ? 'Deleting...' : 'Yes, Delete' }}
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+}
+
+
+
+<!-- View Contact Details -->
+
+@if (selectedContact || viewLoading || viewError) {
+<div class="view-overlay">
+
+    <div class="view-dialog">
+
+        <div class="view-header">
+            <h2>Contact Details</h2>
+
+            <button type="button" (click)="closeView()">
+                ✕
+            </button>
+        </div>
+
+        @if (viewLoading) {
+        <div class="view-loading">
+            Loading contact details...
+        </div>
+        }
+
+        @if (viewError) {
+        <p class="view-error">{{ viewError }}</p>
+        }
+
+        @if (selectedContact; as contact) {
+        <div class="contact-avatar">
+            {{ contact.first_name.charAt(0) | uppercase }}
+        </div>
+
+        <h3 class="contact-name">
+            {{ contact.first_name }} {{ contact.last_name }}
+        </h3>
+
+        <p class="contact-email">{{ contact.emailId }}</p>
+
+        <div class="details-grid">
+
+            <div>
+                <label>First Name</label>
+                <p>{{ contact.first_name }}</p>
+            </div>
+
+            <div>
+                <label>Last Name</label>
+                <p>{{ contact.last_name }}</p>
+            </div>
+
+            <div>
+                <label>Email</label>
+                <p>{{ contact.emailId }}</p>
+            </div>
+
+            <div>
+                <label>Mobile Number</label>
+                <p>{{ contact.mobilenumber }}</p>
+            </div>
+
+            <div>
+                <label>Age</label>
+                <p>{{ contact.age }}</p>
+            </div>
+
+            <div>
+                <label>Gender</label>
+                <p>{{ contact.gender }}</p>
+            </div>
+
+            <div>
+                <label>PAN Number</label>
+                <p>{{ contact.pan_no }}</p>
+            </div>
+
+            <div>
+                <label>Aadhaar Number</label>
+                <p>{{ contact.adhaar_no }}</p>
+            </div>
+
+            <div>
+                <label>Status</label>
+                <p>{{ contact.status ? 'Active' : 'Inactive' }}</p>
+            </div>
+
+            <div>
+                <label>Created At</label>
+                <p>{{ contact.createdAt | date:'mediumDate' }}</p>
+            </div>
+
+        </div>
+
+        <div class="view-footer">
+            <button type="button" (click)="closeView()">
+                Close
+            </button>
+        </div>
+        }
+
+    </div>
+
+</div>
+}

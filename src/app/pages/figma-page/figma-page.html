@@ -1,0 +1,195 @@
+<div class="design-page">
+    <div class="breadcrumb">
+        Send Marketing Message <span>›</span>
+        <strong>Compose Message</strong>
+    </div>
+
+    <div class="design-shell">
+        <header class="page-header">
+            <button class="back-btn" type="button" (click)="goBack()">‹</button>
+            <div>
+                <h1>Customize Your Message</h1>
+                <p>Fill in the required details based on your selected template to complete the message setup.</p>
+            </div>
+        </header>
+
+        <div class="template-info">
+            <div><span>Template Name</span><strong>Diwali Sale</strong></div>
+            <div><span>Template ID</span><strong>5796525814953</strong></div>
+            <div><span>Message Type</span><strong>Text and Rich Media</strong></div>
+            <div><span>Language</span><strong>English</strong></div>
+        </div>
+
+        <main class="form-background">
+            <section class="form-card header-card">
+                <h2>Header</h2>
+
+                <div class="field">
+                    <div class="field-label">
+                        <label for="imageUrl">Image URL</label>
+                        <span>{{ imageUrl.length }}/2048</span>
+                    </div>
+                    <div class="input-box">
+                        <input id="imageUrl" type="url" maxlength="2048" [(ngModel)]="imageUrl"
+                            placeholder="https://" />
+                        <span class="input-symbol">&#123; &#125;</span>
+                    </div>
+                    <p class="hint">Link to supported file format: .jpg, .jpeg, .png up to 5MB. Image may be cropped on
+                        certain devices. Recommended resolution: 1125 x 600 px.</p>
+                </div>
+
+                <div class="field">
+                    <div class="field-label">
+                        <label for="videoUrl">Video URL</label>
+                        <span>{{ videoUrl.length }}/2048</span>
+                    </div>
+                    <div class="input-box">
+                        <input id="videoUrl" type="url" maxlength="2048" [(ngModel)]="videoUrl"
+                            placeholder="https://" />
+                        <span class="input-symbol">&#123; &#125;</span>
+                    </div>
+                    <p class="hint">Link to supported file format: MP4 up to 16 MB. Video may be cropped on certain
+                        devices. Recommended resolution: 1125 x 600 px.</p>
+                </div>
+
+                <div class="field">
+                    <div class="field-label">
+                        <label for="documentUrl">Document URL</label>
+                        <span>{{ documentUrl.length }}/2048</span>
+                    </div>
+                    <div class="input-box">
+                        <input id="documentUrl" type="url" maxlength="2048" [(ngModel)]="documentUrl"
+                            placeholder="https://" />
+                        <span class="input-symbol">&#123; &#125;</span>
+                    </div>
+                    <p class="hint">Link to supported file format: PDF up to 100MB.</p>
+                </div>
+
+                <div class="location-fields">
+                    <div class="field">
+                        <label for="latitude">Location Latitude</label>
+                        <input id="latitude" type="number" [(ngModel)]="latitude" placeholder="0" />
+                        <p class="hint">Latitude can be any number between -90 and 90</p>
+                    </div>
+                    <div class="field">
+                        <label for="longitude">Location Longitude</label>
+                        <input id="longitude" type="number" [(ngModel)]="longitude" placeholder="0" />
+                        <p class="hint">Longitude can be any number between -180 and 180</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-card message-card">
+                <h2>Message</h2>
+
+                <div class="field">
+                    <label for="variable1">Variable [1]</label>
+                    <div class="input-box">
+                        <input id="variable1" type="text" [(ngModel)]="variable1"
+                            placeholder="Enter variable content" />
+                        <span class="input-symbol smile-payload-icons">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="9"></circle>
+                                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                                <path d="M9 9h.01M15 9h.01" stroke-width="2.5"></path>
+                            </svg>
+
+                            <span class="braces-icon">&#123; &#125;</span>
+                        </span>
+                        <button class="purple-action" type="button" (click)="dropdownOpen = !dropdownOpen">
+                            &#123; &#125;
+                        </button>
+                    </div>
+                </div>
+
+                <div class="field variable-field">
+                    <label for="variable2">Variable [2]</label>
+                    <div class="input-box">
+                        <input id="variable2" type="text" [(ngModel)]="variable2"
+                            placeholder="Enter variable content" />
+                    </div>
+
+                    @if (dropdownOpen) {
+                    <div class="variable-dropdown">
+                        <div class="dropdown-search">
+                            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+
+                            <input type="text" [(ngModel)]="variableSearch" placeholder="Search Standard Attributes" />
+                        </div>
+                        <div class="dropdown-tabs">
+                            <button type="button" [class.selected]="activeTab === 'Standard'"
+                                (click)="activeTab = 'Standard'">Standard</button>
+                            <button type="button" [class.selected]="activeTab === 'Custom'"
+                                (click)="activeTab = 'Custom'">Custom</button>
+                        </div>
+                        <div class="dropdown-options">
+                            @for (item of filteredVariables; track item) {
+                            <button type="button" (click)="selectVariable(item)">
+                                <span>&#123; &#125;</span> {{ item }}
+                            </button>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+            </section>
+
+            <section class="form-card buttons-card">
+                <h2>Buttons</h2>
+
+                @for (field of payloadFields; track field.key) {
+                <div class="field">
+                    <div class="field-label">
+                        <label [for]="field.key">{{ field.label }} <span class="info">ⓘ</span></label>
+                        <span>{{ field.value.length }}/128</span>
+                    </div>
+                    <div class="input-box">
+                        <input [id]="field.key" type="text" maxlength="128" [(ngModel)]="field.value"
+                            placeholder="Enter the payload" />
+
+                        <span class="input-symbol payload-icons">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="9"></circle>
+                                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                                <path d="M9 9h.01M15 9h.01" stroke-width="2.5"></path>
+                            </svg>
+
+                            <span class="braces-icon">&#123; &#125;</span>
+                        </span>
+
+                    </div>
+                </div>
+                }
+            </section>
+        </main>
+
+
+        <footer class="form-footer">
+            <button class="cancel-btn" type="button" (click)="resetForm()">
+                <span>Cancel</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="3" />
+                    <path d="M9 9l6 6M15 9l-6 6" />
+                </svg>
+            </button>
+
+            <button class="submit-btn" type="button" (click)="submitForm()">
+                <span>Done composing</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="3" />
+                    <path d="M8.5 12l2.5 2.5 4.5-5" />
+                </svg>
+            </button>
+        </footer>
+
+    </div>
+</div>
