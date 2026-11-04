@@ -30,7 +30,6 @@ export class FigmaPage {
 
   activeTab: 'Standard' | 'Custom' = 'Standard';
 
-  // Standard Variables
   standardVariables: string[] = [
     'First Name',
     'Last Name',
@@ -40,7 +39,7 @@ export class FigmaPage {
     'Gender'
   ];
 
-  // Custom Variables
+ 
   customVariables: string[] = [
     'Customer ID',
     'Order ID',
@@ -48,7 +47,7 @@ export class FigmaPage {
     'Company Name'
   ];
 
-  // Buttons Section
+
   payloadFields = [
     {
       key: 'yes',
@@ -74,7 +73,6 @@ export class FigmaPage {
 
   constructor(private location: Location) {}
 
-  // Filter Variables
   get filteredVariables(): string[] {
     const variables =
       this.activeTab === 'Standard'
@@ -88,23 +86,21 @@ export class FigmaPage {
     );
   }
 
-  // Open Variable Dropdown
   addVariable(): void {
     this.dropdownOpen = !this.dropdownOpen;
   }
 
-  // Select Variable
+ 
   selectVariable(variable: string): void {
     this.variable2 = `{{${variable}}}`;
     this.dropdownOpen = false;
   }
 
-  // Back Button
   goBack(): void {
     this.location.back();
   }
 
-  // Cancel / Reset Form
+ 
   resetForm(): void {
     this.imageUrl = '';
     this.videoUrl = '';
@@ -125,7 +121,7 @@ export class FigmaPage {
     });
   }
 
-  // Validate URL
+
   isValidUrl(value: string): boolean {
     if (!value.trim()) {
       return true;
@@ -140,7 +136,7 @@ export class FigmaPage {
     }
   }
 
-  // Submit Form
+  
   submitForm(): void {
 
     if (!this.isValidUrl(this.imageUrl)) {

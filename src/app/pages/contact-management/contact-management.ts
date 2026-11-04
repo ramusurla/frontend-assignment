@@ -30,7 +30,6 @@ export class ContactManagement implements OnInit {
     this.loadContacts();
   }
 
-  // GET API
  loadContacts(): void {
   this.loading = true;
   this.errorMessage = '';
@@ -261,7 +260,6 @@ confirmDelete(): void {
       this.contactToDelete = null;
       this.successMessage = 'Contact deleted successfully!';
 
-      // Refresh data from API
       this.loadContacts();
     },
     error: (error) => {
