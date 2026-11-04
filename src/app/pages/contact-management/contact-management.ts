@@ -1,11 +1,12 @@
 
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject ,ChangeDetectorRef} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { ContactService } from '../../services/contact';
 import { Contact } from '../../models/contact';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+
 
 @Component({
   selector: 'app-contact-management',
@@ -17,6 +18,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 export class ContactManagement implements OnInit {
 
   private contactService = inject(ContactService);
+  private cdr = inject(ChangeDetectorRef);
 
   contacts: Contact[] = [];
   searchTerm: string = '';
@@ -29,23 +31,27 @@ export class ContactManagement implements OnInit {
   }
 
   // GET API
-  loadContacts(): void {
-    this.loading = true;
-    this.errorMessage = '';
+ loadContacts(): void {
+  this.loading = true;
+  this.errorMessage = '';
 
-    this.contactService.getContacts().subscribe({
-      next: (response: Contact[]) => {
-        this.contacts = response;
-        this.loading = false;
-        console.log('Contacts:', response);
-      },
-      error: (error) => {
-        console.error('GET API Error:', error);
-        this.errorMessage = 'Failed to load contacts.';
-        this.loading = false;
-      }
-    });
-  }
+  this.contactService.getContacts().subscribe({
+    next: (data) => {
+      this.contacts = data;
+      this.loading = false;
+
+      this.cdr.markForCheck();
+    },
+    error: (error) => {
+      console.error('Error loading contacts:', error);
+
+      this.errorMessage = 'Failed to load contacts';
+      this.loading = false;
+
+      this.cdr.markForCheck();
+    }
+  });
+}
 
 
 get filteredContacts(): Contact[] {
@@ -277,24 +283,31 @@ viewError = '';
 
 
 viewContact(contact: Contact): void {
-  if (!contact.id) {
-    this.errorMessage = 'Contact ID not found.';
-    return;
-  }
+  if (!contact.id) return;
 
   this.selectedContact = null;
   this.viewLoading = true;
   this.viewError = '';
 
+  this.cdr.markForCheck();
+
   this.contactService.getContactById(contact.id).subscribe({
-    next: (response: Contact) => {
-      this.selectedContact = response;
+    next: (data) => {
+      console.log('View Contact API Response:', data);
+
+      this.selectedContact = data;
       this.viewLoading = false;
+      this.viewError = '';
+
+      this.cdr.markForCheck();
     },
     error: (error) => {
-      console.error('GET Contact By ID Error:', error);
-      this.viewError = 'Unable to load contact details.';
+      console.error('View Contact Error:', error);
+
       this.viewLoading = false;
+      this.viewError = 'Failed to load contact details';
+
+      this.cdr.markForCheck();
     }
   });
 }
